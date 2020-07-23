@@ -1,0 +1,110 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<script>
+  $(document).ready(function(){
+      $("#add_stocks").click(function(){
+          $('.ui.modal').modal('show');
+      })
+      $("#add").click(function(){
+          var symbols = $("#symbols").val();
+
+          var stockSymbols = symbols.split("\n");
+
+          for (var i = 0; i<stockSymbols.length; ++i) {
+            $.ajax({
+                url: '/stocks',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({"symbol":stockSymbols[i]}),
+                dataType: 'json'
+            })
+          $('.ui.modal').modal('hide');
+          }
+      })
+  });
+</script>
+<form>
+  <div class="ui input">
+    <input name="dividend_yield" type="text" placeholder="Dividend Yield" value="{{ dividend_yield or ''}}">
+  </div>
+
+  <div class="ui input">
+    <input name="forward_pe" type="text" placeholder="Forward Pe" value="{{ forward_pe or ''}}">
+  </div>
+
+
+  <div class="ui toggle checkbox">
+    <input type="checkbox" name="ma50" {% if ma50 %}checked="checked"{% endif %}>
+    <label>Above 50 Day MA</label>
+  </div>
+
+  <div class="ui toggle checkbox">
+    <input type="checkbox" name="ma200" {% if ma200 %}checked="checked"{% endif %}>
+    <label>Above 200 Day MA</label>
+  </div>
+
+  <button type='submit' class="ui secondary button">
+      Filter
+  </button>
+</form>
+  <div>
+    <button id="add_stocks" class="ui primary button">
+      Add Stocks
+    </button>
+  </div>
+
+<table class="ui celled table">
+  <thead>
+    <tr><th>Symbol</th>
+    <th>Price</th>
+    <th>Forward PE</th>
+    <th>Forward EPS</th>
+    <th>Peg Ratio</th>
+    <th>Dividend Yield</th>
+    <th>Dividend Rate</th>
+    <th>Payout Ratio</th>
+    <th>ma50</th>
+    <th>ma200</th>
+  </tr></thead>
+  <tbody>
+    {% for stock in stocks %}
+    <tr>
+      <td>{{ stock.symbol }}</td>
+      <td>{{ stock.price }}</td>
+      <td>{{ stock.forward_pe }}</td>
+      <td>{{ stock.forward_eps }}</td>
+      <td>{{ stock.peg_ratio }}</td>
+      <td>{{ stock.dividend_yield }}</td>
+      <td>{{ stock.dividend_rate }}</td>
+      <td>{{ stock.payout_ratio }}</td>
+      <td>{{ stock.ma50 }}</td>
+      <td>{{ stock.ma200 }}</td>
+    </tr>
+    {% endfor %}  
+  </tbody>
+</table>
+
+<div class="ui modal">
+  <i class="close icon"></i>
+  <div class="header">
+    Add Stock Symbol
+  </div>
+  <div class="content">
+    <div class="ui form">
+      <div class="field">
+        <label>Enter Stock Symbol</label>
+        <textarea id='symbols'></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+    <div id="add" class="ui positive right labeled icon button">
+      Add
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
